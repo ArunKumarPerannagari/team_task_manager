@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -21,10 +22,12 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
+      setError(null);
       const response = await dashboardService.getStats();
       setStats(response.data.data);
     } catch (error) {
       console.error('Error fetching dashboard stats', error);
+      setError('Failed to load dashboard statistics. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -74,7 +77,25 @@ const Dashboard = () => {
     );
   }
 
-  const statusData = stats?.tasksByStatus.map(s => ({
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
+        <div className="bg-rose-100 p-4 rounded-full text-rose-600">
+          <AlertCircle size={48} />
+        </div>
+        <h2 className="text-2xl font-bold text-slate-800">Something went wrong</h2>
+        <p className="text-slate-500 max-w-md">{error}</p>
+        <button 
+          onClick={fetchStats}
+          className="btn btn-primary px-8"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  const statusData = stats?.tasksByStatus?.map(s => ({
     _id: s._id,
     count: s.count
   })) || [];
