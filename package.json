@@ -1,0 +1,16 @@
+{
+  "name": "team-task-manager-root",
+  "version": "1.0.0",
+  "description": "Root package for Team Task Manager",
+  "private": true,
+  "scripts": {
+    "install-all": "npm install --prefix backend && npm install --prefix frontend",
+    "build-frontend": "npm run build --prefix frontend",
+    "start": "cd backend && npm start",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build-frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
