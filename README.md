@@ -62,24 +62,26 @@ cd frontend
 npm run dev
 ```
 
-## 🚆 Railway Deployment
+## 🌐 Render Deployment (Single Service)
 
-### Backend
-1. Connect your repo to Railway.
-2. Set root directory to `backend`.
-3. Add Environment Variables:
-   - `MONGODB_URI`
-   - `JWT_SECRET`
-   - `FRONTEND_URL` (your frontend deployment URL)
-   - `NODE_ENV=production`
+The application is optimized to be deployed as a single Web Service on Render, where the backend serves the compiled frontend.
 
-### Frontend
-1. Connect your repo to Railway as a separate service.
-2. Set root directory to `frontend`.
-3. Add Environment Variable:
-   - `VITE_API_URL` (your backend deployment URL + /api)
-4. Build Command: `npm run build`
-5. Start Command: `npx serve -s dist`
+### Steps:
+
+1. **Create a New Web Service**: Connect your GitHub repository to Render.
+2. **Build Settings**:
+   - **Build Command**: `npm install && npm run install-all && npm run build`
+   - **Start Command**: `npm start`
+3. **Environment Variables**:
+   - `MONGODB_URI`: Your MongoDB Atlas connection string.
+   - `JWT_SECRET`: Your secure secret key.
+   - `NODE_ENV`: `production`
+
+### Why Single Service?
+- **Unified URL**: Frontend and API share the same domain.
+- **No CORS Issues**: Requests are relative.
+- **Simplified Management**: One service to monitor.
+
 
 ## 📄 API Documentation
 

@@ -11,7 +11,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
+  // Determine API URL based on environment
+  // If we are on localhost, use the VITE_API_URL (which usually points to the local backend)
+  // Otherwise, use relative /api path (which is standard for production deployments)
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 
+    (window.location.hostname === 'localhost' ? 'http://localhost:5001/api' : '/api');
+
   useEffect(() => {
+    console.log('AuthContext Initialization:');
+    console.log(' - Hostname:', window.location.hostname);
+    console.log(' - API Base URL:', API_BASE_URL);
+    
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       fetchCurrentUser();
@@ -23,11 +33,10 @@ export const AuthProvider = ({ children }) => {
 
   const fetchCurrentUser = async () => {
     try {
-      // Assuming we have a /me endpoint or similar
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/auth/me`);
+      const response = await axios.get(`${API_BASE_URL}/auth/me`);
       setUser(response.data.data);
     } catch (error) {
-      console.error('Error fetching user', error);
+      console.error('Fetch User Error:', error);
       logout();
     } finally {
       setLoading(false);
@@ -36,7 +45,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/auth/login`, { email, password });
+      console.log('Login attempt at URL:', `${API_BASE_URL}/auth/login`);
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
       const { token, user: userData } = response.data;
       
       localStorage.setItem('token', token);
@@ -45,15 +55,17 @@ export const AuthProvider = ({ children }) => {
       toast.success(`Welcome back, ${userData.name}!`);
       return true;
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      console.error('Login Error Object:', error);
+      const message = error.response?.data?.message || 'The server could not be reached or returned an error.';
+      toast.error(`Login Error: ${message}`);
       return false;
     }
   };
 
   const signup = async (userData) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/auth/signup`, userData);
+      console.log('Signup attempt at URL:', `${API_BASE_URL}/auth/signup`);
+      const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
       const { token, user: newUser } = response.data;
       
       localStorage.setItem('token', token);
@@ -62,8 +74,9 @@ export const AuthProvider = ({ children }) => {
       toast.success(`Account created! Welcome, ${newUser.name}`);
       return true;
     } catch (error) {
-      const message = error.response?.data?.message || 'Signup failed';
-      toast.error(message);
+      console.error('Signup Error Object:', error);
+      const message = error.response?.data?.message || 'The server could not be reached or returned an error.';
+      toast.error(`Signup Error: ${message}`);
       return false;
     }
   };
@@ -78,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (data) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/users/profile`, data);
+      const response = await axios.put(`${API_BASE_URL}/users/profile`, data);
       setUser(response.data.data);
       toast.success('Profile updated!');
       return true;
