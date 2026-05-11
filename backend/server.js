@@ -6,7 +6,15 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Debug logs for environment variables (Safe: only checks if they exist)
+console.log('--- Environment Variable Check ---');
+console.log('JWT_SECRET is defined:', !!process.env.JWT_SECRET);
+console.log('MONGODB_URI is defined:', !!process.env.MONGODB_URI);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('---------------------------------');
+
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
